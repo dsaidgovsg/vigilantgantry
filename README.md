@@ -2,8 +2,4 @@
 
 ## About
 
-<div align="center">
-    <iframe width="620" height="315"
-        src="https://www.youtube.com/embed/4quAADmKs40">
-    </iframe>
-</div>
+[![Alt text](https://img.youtube.com/vi/4quAADmKs40/0.jpg)](https://www.youtube.com/watch?v=4quAADmKs40)
