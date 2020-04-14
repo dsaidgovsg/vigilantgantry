@@ -2,7 +2,11 @@
 
 ## About
 
-[![Alt text](https://img.youtube.com/vi/4quAADmKs40/0.jpg)](https://www.youtube.com/watch?v=4quAADmKs40)
+[![Alt text](/sample/vigilantgantry_image.jpg)](https://www.youtube.com/watch?v=4quAADmKs40)
+
+VigilantGantry is a project by the Government Technology Agency of Singapore developed in response to the COVID19 situation. VigilantGantry integrates existing thermal camera sensors with a physical gantry, along with other systems such as cameras and backend systems. 
+
+The intention of the project is to provide automated access control and thermal scanning to limit exposure of frontline staff to large numbers of human traffic flow, while still ensuring that users of the gantry are adequately checked.
 
 ## Prerequisite
 

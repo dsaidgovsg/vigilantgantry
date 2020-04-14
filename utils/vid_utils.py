@@ -18,14 +18,17 @@ from utils.seg_utils import predictor, model, transforms
 import logging
 from standard_logs.logger import setup_logging
 
+# logging essentials
 setup_logging()
 logger = logging.getLogger(name="face-seg:vid_utils.py")
 logger = logging.getLogger(__name__)
 
+# Endpoint url to post results to for face segmentation results
 ENDPOINT = os.getenv("ENDPOINT", "http://localhost:5000/live_results")
 
-
+# VideoStreamer object class for video streaming capabilities
 class VideoStreamer:
+    # init function
     def __init__(self, src=0, width=640, height=480):
         self.src = src
         self.cap = cv2.VideoCapture(self.src)
@@ -39,6 +42,7 @@ class VideoStreamer:
     def set(self, var1, var2):
         self.cap.set(var1, var2)
 
+    # start streaming
     def start(self):
         if self.started:
             logger.info("VideoStreamer has started")
@@ -48,6 +52,7 @@ class VideoStreamer:
         self.thread.start()
         return self
 
+    # update cap
     def update(self):
         while self.started:
             grabbed, frame = self.cap.read()
@@ -55,25 +60,31 @@ class VideoStreamer:
                 self.grabbed = grabbed
                 self.frame = frame
 
+    # read frame
     def read(self):
         with self.read_lock:
             frame = self.frame.copy()
             grabbed = self.grabbed
         return frame
 
+    # stop streaming
     def stop(self):
         self.started = False
         self.thread.join()
 
+    # exit stream
     def __exit__(self, exec_type, exc_value, traceback):
         self.cap.release()
 
+# checks if input is rtsp
 def if_rtsp(x):
     return True if x[:4] == "rtsp" else False
 
+# checks if input is a webcam (expects an int which represents the device id)
 def if_webcam(x):
     return type(x) is int
 
+# resizes the incoming image
 def resize_img(frame, max_length=640):
     H, W = frame.shape[:2]
     if max(W, H) > max_length:
@@ -90,20 +101,19 @@ def resize_img(frame, max_length=640):
     frame = cv2.resize(frame, (W_resize, H_resize), interpolation=interpolation)
     return frame, W_resize, H_resize
 
-def xywh2x1y1x2y2(x):
-    return ((x[0], x[1]), (x[0] + x[2], x[1] + x[3]))
-
+# Saves ROI, so that it can be used later to identifying ROI
 def save_roi(roi, lane_no):
     now = datetime.now()
     current_time = now.strftime("%Y%m%d%H%M%S")
     with open(f"roi/{str(lane_no)}_{str(current_time)}.txt", "w") as f:
         f.write(str(roi))
 
+# Loads ROI
 def load_roi(fn):
     with open(fn, "r") as f:
         return eval(f.read())
 
-
+# Prompts user to draw roi, and saves it
 def return_roi(frame):
     roi_1 = cv2.selectROI("Frame", frame, fromCenter=False, showCrosshair=False)
     roi_1 = xywh2x1y1x2y2(roi_1)
@@ -117,21 +127,27 @@ def return_roi(frame):
 
     return roi_1, roi_2
 
+# changes bounding box format from XYWH to X1Y1X2Y2
 def xywhTOx1y1x2y2(x):
     return ((x[0], x[1]), (x[0] + x[2], x[1] + x[3]))
 
+# changes bounding box format from X1Y1X2Y2 to XYWH 
 def x1y1x2y2TOxywh(x):
     return (x[0][0], x[0][1], x[1][0] - x[0][0], x[1][1] - x[0][1])
 
+# calculates bounding box area
 def get_bbox_area(bbox):
     return (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
 
+# calculates length ratio of bounding box to ROI
 def get_roi_bbox_length_ratio(roi, bbox):
     return (bbox[2] - bbox[0]) / (roi[1][0] - roi[0][0])
 
+# calculate area ratio of bounding box to ROI
 def get_roi_bbox_area_ratio(roi, bbox):
     return get_bbox_area(bbox) / ((roi[1][0] - roi[0][0]) * (roi[1][1] - roi[0][1]))
 
+# checks if bounding box intersects ROI
 def if_inside_rectange(roi, bbox):
     return (
         bbox[0] >= roi[0][0]
@@ -140,6 +156,7 @@ def if_inside_rectange(roi, bbox):
         and bbox[3] <= roi[1][1]
     )
 
+# calculate area of intersection between bounding box and ROI
 def get_percent_intersection(roi, bbox):
     if if_inside_rectange(roi, bbox):
         return 1.0
@@ -152,14 +169,16 @@ def get_percent_intersection(roi, bbox):
         bbox_area = (bbox[2] - bbox[0] + 1) * (bbox[3] - bbox[1] + 1)
         return intsc_area / bbox_area
 
+# get the upper half of the bounding box
 def get_upper_portion(bbox, percent):
     x1, y1, x2, y2 = bbox
     return x1, y1, x2, int(y2 * percent)
 
+# checks if a point is in a rectangle
 def insideRect(rect, pt):
     return pt[0] > rect[0] and pt[0] < rect[2] and pt[1] > rect[1] and pt[1] < rect[3]
 
-
+# runs face segmentation, and also saves cropped image
 def calculate_seg(image, face_coord):
     f_min_x, f_min_y, f_max_x, f_max_y = xywhTOx1y1x2y2_bbox(face_coord)
     h, w = f_max_y - f_min_y, f_max_x - f_min_x
@@ -186,6 +205,7 @@ def calculate_seg(image, face_coord):
     image = display_seg(image, masked_img_b, face_coord)
     return (np.sum(masked_img_b) / (masked_img_b.shape[0] * masked_img_b.shape[1])), image
 
+# display segmentation image 
 def display_seg(image, masked_img_b, face_coord):
     f_min_x, f_min_y, f_max_x, f_max_y = xywhTOx1y1x2y2_bbox(face_coord)
     masked_img_b = np.where(masked_img_b == 1, 255, masked_img_b)
@@ -201,7 +221,8 @@ def display_seg(image, masked_img_b, face_coord):
 def xyxy2xywh(x):
     return x[0], x[1], x[2]-x[0], x[3]-x[1]
 
-def process_frame(cur_img, roi, lane_hitzone, gantry_id, model, endpoint, threshold_value):
+# process individual frame
+def process_frame(cur_img, roi, lane_hitzone, gantry_id, model, threshold_value):
     try:
         cv2.rectangle(cur_img, roi[0], roi[1], (255, 255, 255))
         vis_img = cur_img[roi[0][1] : roi[1][1], roi[0][0] : roi[1][0]]
@@ -217,12 +238,12 @@ def process_frame(cur_img, roi, lane_hitzone, gantry_id, model, endpoint, thresh
         logger.error(e)
     return cur_img, output1
 
+# process entire video
 def process_video(
     vid_path,
     roi,
     lane_hitzone,
     gantry_id,
-    endpoint,
     threshold_value,
     full_screen=False,
 ):
@@ -243,7 +264,7 @@ def process_video(
         if frame is None:
             break
         frame, output = process_frame(
-            frame, roi, lane_hitzone, gantry_id, yolo_model, endpoint, threshold_value
+            frame, roi, lane_hitzone, gantry_id, yolo_model, threshold_value
         )
         cv2.imshow("Face Segmemtation", frame)
         if cv2.waitKey(1) == 27:
@@ -251,6 +272,7 @@ def process_video(
     vid.stop()
     cv2.destroyAllWindows()
 
+# run face segmentation
 def run_face_seg_engine(
     img, roi, lane_hitzone, candidates, threshold_value, gantry_id, change_color=None
 ):
