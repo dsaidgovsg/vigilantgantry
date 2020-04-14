@@ -1,8 +1,7 @@
 <h2 align="center">VigilantGantry (Face Segmentation AI Engine)</h2>
 
 ## About
-
-[![Alt text](/sample/vigilantgantry_image.jpg)](https://www.youtube.com/watch?v=4quAADmKs40)
+<a href="https://www.youtube.com/watch?v=4quAADmKs40"><img src="https://github.com/dsaidgovsg/vigilantgantry/blob/dev/face_seg/sample/vigilantgantry_image.jpg?raw=true" width="200"></a>
 
 VigilantGantry is a project by the Government Technology Agency of Singapore developed in response to the COVID19 situation. VigilantGantry integrates existing thermal camera sensors with a physical gantry, along with other systems such as cameras and backend systems. 
 
