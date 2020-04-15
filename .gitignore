@@ -159,3 +159,4 @@ samples/*
 *.so
 *.pkl
 .pdf
+sample/crop_img/*.png
