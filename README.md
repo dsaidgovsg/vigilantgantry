@@ -21,8 +21,8 @@ The architecture is modular and can be integrated with off-the-shelf electronics
 
 We have tested the following off-the-shelf systems and solutions:
 
-Omnisense Sentry MKIII (webcam)
-STELOP IFSS (webcam)
+* Omnisense Sentry MKIII (webcam)
+* STELOP IFSS (webcam)
  
 Here are suggestions for the open-source community to expand the functionalities:
 
