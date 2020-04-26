@@ -4,6 +4,7 @@
 ~~~~~~~~~~~~~~~
 This module is a wrapper around OpenCV which allows for asynchronous video capturing from RTSP address or webcam id.
 
+
 Credits: http://blog.blitzblit.com/2017/12/24/asynchronous-video-capture-in-python-with-opencv/
 """
 import cv2

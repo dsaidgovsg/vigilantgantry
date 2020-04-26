@@ -2,7 +2,8 @@
 
 """
 ~~~~~~~~~~~~~~~
-This FaceSegmentor performs face segmentation and an array of pixel
+This FaceSegmentor module performs face segmentation.
+
 """
 import PIL
 import cv2
@@ -10,14 +11,26 @@ import torch
 import numpy as np
 from torchvision import transforms
 from face_segmentor.nets.MobileNetV2_unet import MobileNetV2_unet
+from pipeline.utils import *
 
 
 class FaceSegmentor:
+    """
+     FaceSegmentor class that is configurable and returns amount of face skin detected. 
+
+    """
+
     def __init__(self):
         self.pre_trained = "face_segmentor/checkpoints/model.pt"
         self.model = self.load_model()
 
     def load_model(self):
+        """
+        load_model: Load face segmentation model
+
+        :return: face segmentation model
+        :rtype: PyTorch Tensors
+        """
         model = MobileNetV2_unet(None).to("cuda")
         state_dict = torch.load(self.pre_trained, map_location="cuda")
         model.load_state_dict(state_dict)
@@ -25,8 +38,17 @@ class FaceSegmentor:
         return model
 
     def get_segmentation_value(self, image, face_coord):
+        """
+        get_segmentation_value:  Returns the percentage of exposed skin to face ration
 
-        f_min_x, f_min_y, f_max_x, f_max_y = xywhTOx1y1x2y2_bbox(face_coord)
+        :param image: Frame
+        :type image: np.array
+        :param face_coord: Coordinates of face
+        :type face_coord: list of
+        :return: tuple
+        :rtype: float and np.array
+        """
+        f_min_x, f_min_y, f_max_x, f_max_y = xywh2xyxy(face_coord)
         h, w = f_max_y - f_min_y, f_max_x - f_min_x
         pil_img_c = image[f_min_y : f_min_y + h, f_min_x : f_min_x + w]
         pil_img = PIL.Image.fromarray(pil_img_c)
@@ -54,6 +76,20 @@ class FaceSegmentor:
         )
 
     def display_segmentation(self, image, masked_img_b, face_coord):
+        """
+        display_segmentation visualize face segmentation
+
+        [extended_summary]
+
+        :param image: frame
+        :type image: np.array
+        :param masked_img_b: image
+        :type masked_img_b: np.array
+        :param face_coord: Coordinate of person face
+        :type face_coord: List of np.array
+        :return: Frame
+        :rtype: np.array
+        """
         f_min_x, f_min_y, f_max_x, f_max_y = xywhTOx1y1x2y2_bbox(face_coord)
         masked_img_b = np.where(masked_img_b == 1, 255, masked_img_b)
         masked_img_b = np.where(masked_img_b == 2, 255, masked_img_b)

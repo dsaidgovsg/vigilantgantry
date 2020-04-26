@@ -2,7 +2,7 @@
 
 """
 ~~~~~~~~~~~~~~~
-This FaceDetector module performs face detection and return bounding box.
+This FaceDetector module performs face detection and return face bounding box.
 """
 import torch
 
@@ -15,7 +15,15 @@ import numpy as np
 
 
 class FaceDetector:
+    """
+    FaceDetector class that is configurable and returns face bounding boxes. 
+    """
+
     def __init__(self):
+        """
+        __init__: For configuration
+
+        """
         input_img_size = 480
         define_img_size(input_img_size)
         label_path = "face_detector/models/voc-model-labels.txt"
@@ -34,13 +42,20 @@ class FaceDetector:
         )
 
     def get_face_bbox(self, image):
+        """
+        get_face_bbox: Return a list containing bounding boxes.
+
+        :param image: np.array for frame
+        :type image: np.array
+        :return: list of containing a list of bounding boxes
+        :rtype: list containing np.array
+        """
         boxes, labels, probs = self.predictor.predict(
             image, self.candidate_size / 2, self.threshold
         )
         boxes_lst = list()
         for i in range(boxes.size(0)):
             box = boxes[i, :]
-            box[0], box[1], box[2], box[3] = (box[0], box[1], box[2], box[3])
-            box = np.array(box).astype(int)
+            box = np.array((box[0], box[1], box[2], box[3])).astype(int)
             boxes_lst.append(box)
         return boxes_lst

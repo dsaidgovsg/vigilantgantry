@@ -2,14 +2,25 @@
 
 """
 ~~~~~~~~~~~~~~~
-This video processor module ingestes video streams from either RTSP, webcam or video file and performs face segmentation.
+The run_pipeline and run_heuristic connects the various AI algo together.
+
+
 """
 import cv2
 import colorsys
 import numpy as np
 import threading
 
-# from utils.vis_utils import display_bbox
+from pipeline.utils import (
+    xyxy2xywh,
+    xywh2xyxy,
+    get_centriod,
+    if_point_intersect_with_rect,
+    get_frame_inside_roi,
+    push_output_result,
+    get_intercept_zone,
+    display_bbox,
+)
 
 
 def run_pipeline(
@@ -22,6 +33,30 @@ def run_pipeline(
     person_detect_intercept_boundary,
     gantry_id,
 ):
+    """
+    run_pipeline Connects all the various AI algo together
+
+    [extended_summary]
+
+    :param frame: Video frame
+    :type frame: np.array
+    :param person_detector: Person detector object
+    :type person_detector: PersonDetector class
+    :param face_detector: Face detector object
+    :type face_detector: FaceDetector class
+    :param face_segmentor:  Face segmentation object
+    :type face_segmentor: Face segmentation class
+    :param face_seg_threshold_value: Percentage of coverage acceptable
+    :type face_seg_threshold_value: float
+    :param person_detect_roi_boundary: ROI to detect person
+    :type person_detect_roi_boundary: ruple
+    :param person_detect_intercept_boundary: ROI to detect face
+    :type person_detect_intercept_boundary: tuple
+    :param gantry_id: ID of gantry 
+    :type gantry_id: int
+    :return: Processed Video frame
+    :rtype: np.array
+    """
     intercept_zone = get_intercept_zone(
         person_detect_roi_boundary, person_detect_intercept_boundary
     )
@@ -32,12 +67,12 @@ def run_pipeline(
         (255, 255, 255),
         1,
     )
-    candidates = person_detector.get_human_bbox(frame, "person")
-    for candidate in candidates:
-        bbox = np.array(candidate).astype(int)
+    persons = person_detector.get_human_bbox(frame, "person")
+    for person in persons:
+        bbox = np.array(person).astype(int)
         if (bbox > 1).all():
             if if_point_intersect_with_rect(
-                person_detect_intercept_boundary, get_centriod_x1y1x2y2_bbox(bbox)
+                person_detect_intercept_boundary, get_centriod(bbox)
             ):
                 run_heuristic(
                     frame,
@@ -47,108 +82,41 @@ def run_pipeline(
                     face_segmentor,
                     gantry_id,
                 )
-                cv2.circle(frame, get_centriod_x1y1x2y2_bbox(bbox), 10, (0, 0, 255), -1)
+                cv2.circle(frame, get_centriod(bbox), 10, (0, 0, 255), -1)
     return frame
 
 
 def run_heuristic(
     frame, bbox, threshold_value, face_detector, face_segmentor, gantry_id
 ):
-    frame_inside_roi = get_frame_inside_roi(frame, xywhTOx1y1x2y2_bbox(bbox))
+    """
+    run_heuristic Performs logic
+
+
+    :param frame:  Video frame
+    :type frame: np.array
+    :param bbox: Face bouding box
+    :type bbox: tuple
+    :param threshold_value: Percentage of coverage acceptable
+    :type threshold_value: float
+    :param face_detector: FaceDetector class
+    :type face_detector: Face detecto object
+    :param face_segmentor: FaceSegmentor class
+    :type face_segmentor: Face segmentor object
+    :param gantry_id: ID of gantry 
+    :type gantry_id: int
+    :return: output from face segmentation
+    :rtype: dict
+    """
+    frame_inside_roi = get_frame_inside_roi(frame, xywh2xyxy(bbox))
     boxes = face_detector.get_face_bbox(frame_inside_roi)
-    threshold_set, _ = face_segmentor.get_segmentation_value(
+    computed_seg_value, _ = face_segmentor.get_segmentation_value(
         frame_inside_roi, xyxy2xywh(boxes[0])
     )
-    if threshold_set > threshold_value:
-        frame = display_bbox(frame, bbox, "OK", change_color=None)
+    if computed_seg_value > threshold_value:
+        frame = display_bbox(frame, bbox, "NOT COVERED")
         output = push_output_result(gantry_id, 1)
     else:
-        frame = display_bbox(frame, bbox, "COVERED", 70, change_color=None)
+        frame = display_bbox(frame, bbox, "COVERED", "red")
         output = push_output_result(gantry_id, 0)
-    print(output)
     return output
-
-
-def xyxy2xywh(x):
-    return x[0], x[1], x[2] - x[0], x[3] - x[1]
-
-
-def xywhTOx1y1x2y2_bbox(x):
-    return [x[0], x[1], x[0] + x[2], x[1] + x[3]]
-
-
-def get_centriod_x1y1x2y2_bbox(x):
-    x1, y1, x2, y2 = xywhTOx1y1x2y2_bbox(x)
-    return ((x1 + x2) // 2, (y1 + y2) // 2)
-
-
-def if_point_intersect_with_rect(rect, pt):
-    return pt[0] > rect[0] and pt[0] < rect[2] and pt[1] > rect[1] and pt[1] < rect[3]
-
-
-def get_frame_inside_roi(frame_inside_roi, bbox):
-    f_min_x, f_min_y, f_max_x, f_max_y = xywhTOx1y1x2y2_bbox(bbox)
-    h, w = f_max_y - f_min_y, f_max_x - f_min_x
-    frame_inside_roi = frame_inside_roi[:, :, ::-1]
-    frame_inside_roi = frame_inside_roi[f_min_y : f_min_y + h, f_min_x : f_min_x + w]
-    return frame_inside_roi
-
-
-def push_output_result(gantry_id, verify):
-    import uuid
-    import time
-
-    uuid_id = str(uuid.uuid4())
-    millis = int(round(time.time() * 1000))
-    output_json = {
-        "request_id": uuid_id,
-        "gantry_id": gantry_id,
-        "timestamp": millis,
-        "pass": verify,
-        "check_type": "face_segmentation",
-    }
-    return output_json
-
-
-def get_intercept_zone(person_detect_roi_boundary, person_detect_intercept_boundary):
-    return [
-        person_detect_intercept_boundary[0] - person_detect_roi_boundary[0][0],
-        person_detect_intercept_boundary[1] - person_detect_roi_boundary[0][1],
-        person_detect_intercept_boundary[2] - person_detect_roi_boundary[0][0],
-        person_detect_intercept_boundary[3] - person_detect_roi_boundary[0][1],
-    ]
-
-
-def create_unique_color_uchar(tag, hue_step=0.41):
-    r, g, b = create_unique_color_float(tag, hue_step)
-    return int(255 * r), int(255 * g), int(255 * b)
-
-
-def create_unique_color_float(tag, hue_step=0.41):
-    h, v = (tag * hue_step) % 1, 1.0 - (int(tag * hue_step) % 4) / 5.0
-    r, g, b = colorsys.hsv_to_rgb(h, 1.0, v)
-    return r, g, b
-
-
-def display_bbox(frame, bbox, text, color_id=1, change_color=None):
-    color = create_unique_color_uchar(color_id)
-    x1, y1, w, h = bbox
-    p1 = (int(x1), int(y1))
-    p2 = (int(x1 + w), int(y1 + h))
-    cv2.rectangle(frame, p1, p2, color)
-
-    l1 = (bbox[0], bbox[1] - 10)
-    l2 = (bbox[2] + bbox[0], bbox[1])
-    t1 = (bbox[0], bbox[1] - 3)
-    cv2.rectangle(frame, l1, l2, color, cv2.FILLED)
-
-    if sum(color) / 3 < 97:
-        text_colour = (255, 255, 255)
-    else:
-        text_colour = (0, 0, 0)
-
-    cv2.putText(
-        frame, text, t1, cv2.FONT_HERSHEY_SIMPLEX, 0.35, text_colour, 1, cv2.LINE_AA
-    )
-
-    return frame

@@ -2,6 +2,9 @@
 
 """
 ~~~~~~~~~~~~~~~
+Yolov3 Model for person detection.
+
+
 Credits: https://github.com/ayooshkathuria/pytorch-yolo-v3
 """
 from __future__ import division
@@ -139,7 +142,6 @@ def write_results(prediction, confidence, num_classes, nms=True, nms_conf=0.4):
     box_a[:, :, 3] = prediction[:, :, 1] + prediction[:, :, 3] / 2
     prediction[:, :, :4] = box_a[:, :, :4]
 
-
     batch_size = prediction.size(0)
 
     output = prediction.new(1, prediction.size(2) + 1)
@@ -223,6 +225,7 @@ def write_results(prediction, confidence, num_classes, nms=True, nms_conf=0.4):
     #  import ipdb;ipdb.set_trace()
     return output
 
+
 def write_results_origin(prediction, confidence, num_classes, nms=True, nms_conf=0.4):
     conf_mask = (prediction[:, :, 4] > confidence).float().unsqueeze(2)
     prediction = prediction * conf_mask
@@ -238,7 +241,6 @@ def write_results_origin(prediction, confidence, num_classes, nms=True, nms_conf
     box_a[:, :, 2] = prediction[:, :, 0] + prediction[:, :, 2] / 2
     box_a[:, :, 3] = prediction[:, :, 1] + prediction[:, :, 3] / 2
     prediction[:, :, :4] = box_a[:, :, :4]
-
 
     batch_size = prediction.size(0)
 
@@ -405,7 +407,6 @@ def write_results_half(prediction, confidence, num_classes, nms=True, nms_conf=0
     box_a[:, :, 2] = prediction[:, :, 0] + prediction[:, :, 2] / 2
     box_a[:, :, 3] = prediction[:, :, 1] + prediction[:, :, 3] / 2
     prediction[:, :, :4] = box_a[:, :, :4]
-
 
     batch_size = prediction.size(0)
 

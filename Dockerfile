@@ -23,23 +23,25 @@ RUN pip3 install -r requirements.txt
 WORKDIR /gdrive
 RUN git clone https://github.com/circulosmeos/gdown.pl.git
 RUN chmod +x gdown.pl/gdown.pl
-WORKDIR /app/face_seg/checkpoints
+
+WORKDIR /app/face_segmentor/checkpoints
 RUN /gdrive/gdown.pl/gdown.pl https://drive.google.com/file/d/1Zj_OqQD3huwASMEUfrloKrm7ZYj_DJR6/view?usp=sharing model.pt
-WORKDIR /app/yolo_v3
+
+WORKDIR /app/person_detector/weights
 RUN /gdrive/gdown.pl/gdown.pl https://drive.google.com/open?id=1SGjL_7t4FDaPxMM45lcP6o1-jLthHZRv yolov3.weights \
     && /gdrive/gdown.pl/gdown.pl https://drive.google.com/file/d/1e7mgEqI0sJ7jBL3z8R2jWRlnaW_p5y2a/view?usp=sharing tiny_yolov3.weights
-WORKDIR /app/face_det/models
+
+WORKDIR /app/face_detector/models
 RUN /gdrive/gdown.pl/gdown.pl https://drive.google.com/open?id=18qIxdW7zh7zPu7fZKzfglMvq0t2qm6YN Mb_Tiny_RFB_FD_train_input_320.pth
 
 WORKDIR /app
-COPY ./face_seg /app/face_seg
-COPY ./yolo_v3 /app/yolo_v3
-COPY ./face_det /app/face_det
+COPY ./face_detector /app/face_detector
+COPY ./face_segmentor /app/face_segmentor
+COPY ./person_detector /app/person_detector
+COPY ./pipeline /app/pipeline
 COPY ./sample /app/sample
-COPY ./utils /app/utils
 COPY ./standard_logs /app/standard_logs
-
-WORKDIR /app
+COPY ./video_processor /app/video_processor
 COPY ./main.py /app/main.py
 
 ENV QT_X11_NO_MITSHM 1 

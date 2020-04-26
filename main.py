@@ -2,12 +2,10 @@
 
 """
 ~~~~~~~~~~~~~~~
-This file is the entrypoint to the program.
+This file is the entrypoint to the VigilantGantry Face Segmentation AI Engine program.
 """
-
 import argparse, os
 
-# from utils import vid_utils
 
 from video_processor.video_processor import VideoProcessor
 
@@ -24,7 +22,7 @@ PERSON_DETECTION_ROI_BOUNDARY = tuple(
     os.getenv("PERSON_DETECTION_ROI_BOUNDARY", default=((0, 0), (1280, 720)))
 )
 PERSON_DETECTION_INTERCEPT_BOUNDARY = list(
-    os.getenv("PERSON_DETECTION_INTERCEPT_BOUNDARY", default=[600, 350, 700, 450])
+    os.getenv("PERSON_DETECTION_INTERCEPT_BOUNDARY", default=((600, 350), (700, 450)))
 )
 GANTRY_ID = int(os.getenv("GANTRY_ID", default=1))
 FACE_SEG_THRESHOLD_VALUE = float(os.getenv("FACE_SEG_THRESHOLD_VALUE", default=0.5))
@@ -80,17 +78,6 @@ if __name__ == "__main__":
     if video_source is not None and video_source.isdigit():
         video_source = int(video_source)
 
-    video_session = VideoProcessor(
-        video_source=video_source,
-        video_width=1280,
-        video_height=720,
-        person_detect_roi_boundary=args.person_detect_roi_boundary,
-        person_detect_intercept_boundary=args.person_detect_intercept_boundary,
-        gantry_id=args.gantry_id,
-        face_seg_threshold_value=args.face_seg_threshold_value,
-        full_screen_display=args.full_screen_display,
-    )
-
     person_detector = PersonDetector(
         class_path="person_detector/data/coco.names",
         config_path="person_detector/cfg/yolov3.cfg",
@@ -104,4 +91,16 @@ if __name__ == "__main__":
     )
     face_detector = FaceDetector()
     face_segmentor = FaceSegmentor()
+
+    video_session = VideoProcessor(
+        video_source=video_source,
+        video_width=1280,
+        video_height=720,
+        person_detect_roi_boundary=args.person_detect_roi_boundary,
+        person_detect_intercept_boundary=args.person_detect_intercept_boundary,
+        gantry_id=args.gantry_id,
+        face_seg_threshold_value=args.face_seg_threshold_value,
+        full_screen_display=args.full_screen_display,
+    )
+
     video_session.process_video(person_detector, face_detector, face_segmentor)

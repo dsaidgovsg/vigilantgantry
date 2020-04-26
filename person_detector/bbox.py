@@ -2,6 +2,9 @@
 
 """
 ~~~~~~~~~~~~~~~
+Yolov3 Model for person detection.
+
+
 Credits: https://github.com/ayooshkathuria/pytorch-yolo-v3
 """
 from __future__ import division

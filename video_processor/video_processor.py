@@ -3,6 +3,8 @@
 """
 ~~~~~~~~~~~~~~~
 This video processor module ingestes video streams from either RTSP, webcam or video file and performs face segmentation.
+
+
 """
 import logging
 
@@ -62,7 +64,9 @@ class VideoProcessor(VideoStreamer):
 
     def process_frame(self, frame):
         roi = self.person_detect_roi_boundary
-        cv2.rectangle(frame, roi[0], roi[1], (255, 255, 255))
+        cv2.rectangle(
+            frame, (roi[0][0], roi[0][1]), (roi[1][0], roi[1][1]), (255, 255, 255)
+        )
         roi_frame = frame[roi[0][1] : roi[1][1], roi[0][0] : roi[1][0]]
         roi_frame = run_pipeline(
             frame,
@@ -77,6 +81,3 @@ class VideoProcessor(VideoStreamer):
         frame[roi[0][1] : roi[1][1], roi[0][0] : roi[1][0]] = roi_frame
 
         return frame
-
-    def reset_video(self):
-        pass

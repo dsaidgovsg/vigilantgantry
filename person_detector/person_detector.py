@@ -2,7 +2,9 @@
 
 """
 ~~~~~~~~~~~~~~~
-This PersonDetector module performs human detection and return a list of bounding boxes.
+This PersonDetector class performs human detection and return a list of bounding boxes.
+
+
 """
 
 import torch
@@ -14,6 +16,10 @@ from torch.autograd import Variable
 
 
 class PersonDetector:
+    """
+    PersonDetector class that is configurable and returns persons bounding boxes. 
+    """
+
     def __init__(
         self,
         class_path,
@@ -41,16 +47,29 @@ class PersonDetector:
             self.cuda = True
             self.model.cuda()
 
-    def check(self):
-        inp_dim = int(self.model.net_info["height"])
-        assert inp_dim % 32 == 0
-        assert inp_dim > 32
-
     def model(self):
+        """
+        model Returns YoloV3 Model
+
+        :return: YoloV3 model
+        :rtype: PyTorch Tensors
+        """
         self.model.eval()
         return model
 
     def get_human_bbox(self, frame, img_class="person"):
+        """
+        get_human_bbox [summary]
+
+        [extended_summary]
+
+        :param frame: Video Frame
+        :type frame: np.array
+        :param img_class: label from COCO dataset, defaults to "person"
+        :type img_class: str, optional
+        :return: List of bounding boxes
+        :rtype: List of np.array
+        """
         bboxs, probs, clses = self.inference(frame)
         human_candidates = []
         for b, c in zip(bboxs, clses):
