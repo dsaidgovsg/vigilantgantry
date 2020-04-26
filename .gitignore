@@ -154,6 +154,7 @@ samples/*
 *.weights
 
 # File Extension
+*.jpg
 *.pth.tar
 *.mp4
 *.so

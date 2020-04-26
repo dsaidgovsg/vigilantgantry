@@ -23,9 +23,7 @@ import os.path as osp
 from darknet import Darknet
 from preprocess import prep_image, inp_to_image
 import random
-import ipdb
 
-pdb = ipdb.set_trace
 sys.path.pop(0)
 
 num_classes = 80
@@ -64,14 +62,9 @@ CUDA = torch.cuda.is_available()
 
 def load_model():
     start = 0
-
     classes = load_classes(yolo_dir + "/data/coco.names")
-    # Set up the neural network
-    print("Loading YOLO network.....")
     model = Darknet(args.cfgfile)
     model.load_weights(args.weightsfile)
-    print("Network successfully loaded")
-
     model.net_info["height"] = args.reso
     inp_dim = int(model.net_info["height"])
     assert inp_dim % 32 == 0
@@ -85,11 +78,6 @@ def load_model():
 
 
 def inference(images, model):
-    """
-    images: numpy array
-    model: yolo model
-    return: human bboxs, scores
-    """
     start = 0
     classes = load_classes(yolo_dir + "/data/coco.names")
 
@@ -100,36 +88,27 @@ def inference(images, model):
     orig_ims = [x[1] for x in batches]
     im_dim_list = [x[2] for x in batches]
     im_dim_list = torch.FloatTensor(im_dim_list).repeat(1, 2)
-
     if CUDA:
         im_dim_list = im_dim_list.cuda()
-
     for batch in im_batches:
-        # load the image
         if CUDA:
             batch = batch.cuda()
         with torch.no_grad():
             prediction = model(Variable(batch), CUDA)
-
         output = write_results(
             prediction, confidence, num_classes, nms=True, nms_conf=nms_thesh
         )
-
         if CUDA:
             torch.cuda.synchronize()
-
     try:
         output
     except NameError:
-        print("No detections were made")
         exit()
     im_dim_list = torch.index_select(im_dim_list, 0, output[:, 0].long())
     scaling_factor = torch.min(inp_dim / im_dim_list, 1)[0].view(-1, 1)
     output[:, [1, 3]] -= (inp_dim - scaling_factor * im_dim_list[:, 0].view(-1, 1)) / 2
     output[:, [2, 4]] -= (inp_dim - scaling_factor * im_dim_list[:, 1].view(-1, 1)) / 2
     output[:, 1:5] /= scaling_factor
-
-    # select human and export bbox
     human_candidates = []
     scores = []
     im_id_list = []
@@ -138,10 +117,7 @@ def inference(images, model):
         im_id = item[-1]
         im_id_list.append(im_id)
         if int(im_id) in [0, 7]:
-            # if int(im_id) in [0,7]:
-            # x1,y1,x2,y2 = bbox
             bbox = item[1:5].cpu().numpy()
-            # convert float32 to .2f data
             bbox = [round(i, 2) for i in list(bbox)]
             score = item[5]
             human_candidates.append(bbox)
