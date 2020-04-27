@@ -2,7 +2,7 @@
 
 """
 ~~~~~~~~~~~~~~~
-This video processor module ingestes video streams from either RTSP, webcam or video file and performs face segmentation.
+This video processor module ingest video streams from either RTSP, webcam or video file.
 
 
 """
@@ -34,7 +34,9 @@ class VideoProcessor(VideoStreamer):
         face_seg_threshold_value,
         full_screen_display,
     ):
-        super(VideoProcessor, self).__init__(video_source, video_width, video_height)
+        super(VideoProcessor, self).__init__(
+            video_source, self.video_width, self.video_height
+        )
         self.person_detect_roi_boundary = person_detect_roi_boundary
         self.person_detect_intercept_boundary = person_detect_intercept_boundary
         self.gantry_id = gantry_id
@@ -42,12 +44,26 @@ class VideoProcessor(VideoStreamer):
         self.full_screen_display = full_screen_display
 
     def process_video(self, person_detector, face_detector, face_segmentor):
+        """
+        process_video processes video using 3 algos namely person detection, face detection, face segmentation 
+
+        :param person_detector: Person Detection
+        :type person_detector: PersonDetector class
+        :param face_detector: Face Detection
+        :type face_detector: FaceDetector class
+        :param face_segmentor: Face Segmentation 
+        :type face_segmentor: FaceSegmentation class
+        """
         self.person_detector = person_detector
         self.face_detector = face_detector
         self.face_segmentor = face_segmentor
 
-        if if_rtsp(self.video_source) or if_webcam(self.video_source):
+        if if_rtsp(self.video_source):
             vid = VideoStreamer(self.video_source).start()
+
+        if if_webcam(self.video_source):
+            vid = CamGear(source=int(self.video_source)).start()
+
         else:
             vid = CamGear(source=self.video_source).start()
 
@@ -63,6 +79,14 @@ class VideoProcessor(VideoStreamer):
         cv2.destroyAllWindows()
 
     def process_frame(self, frame):
+        """
+        process_frame Process indivdual frame
+
+        :param frame: Video frame
+        :type frame: np.array
+        :return: Processed video frame
+        :rtype: np.array
+        """
         roi = self.person_detect_roi_boundary
         cv2.rectangle(
             frame, (roi[0][0], roi[0][1]), (roi[1][0], roi[1][1]), (255, 255, 255)

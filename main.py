@@ -38,8 +38,12 @@ if __name__ == "__main__":
         dest="video_source",
         type=str,
         default="sample/sample.mp4",
-        help="insert binary video file path or rtsp address or webcam id",
+        help="insert either video file path (e.g. \home\), rtsp address (e.g. 'rtsp:\\') or webcam id (e.g. '0')",
     )
+
+    parser.add_argument("--video_width", type=int, default=1280, help="video width")
+
+    parser.add_argument("--video_height", type=int, default=720, help="video height")
 
     parser.add_argument(
         "--person_detect_roi_boundary",
@@ -73,11 +77,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    # if video source is webcam, convert str to int
-    video_source = args.video_source
-    if video_source is not None and video_source.isdigit():
-        video_source = int(video_source)
-
     person_detector = PersonDetector(
         class_path="person_detector/data/coco.names",
         config_path="person_detector/cfg/yolov3.cfg",
@@ -93,9 +92,9 @@ if __name__ == "__main__":
     face_segmentor = FaceSegmentor()
 
     video_session = VideoProcessor(
-        video_source=video_source,
-        video_width=1280,
-        video_height=720,
+        video_source=args.video_source,
+        video_width=args.video_width,
+        video_height=args.video_height,
         person_detect_roi_boundary=args.person_detect_roi_boundary,
         person_detect_intercept_boundary=args.person_detect_intercept_boundary,
         gantry_id=args.gantry_id,

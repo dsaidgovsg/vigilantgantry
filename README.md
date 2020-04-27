@@ -13,7 +13,7 @@ The intention of the project is to provide automated access control and thermal 
  
 VigilantGantry is useful for automating high traffic volume sites screening in detection of symptomatic COVID-19 cases. It aids ground staff to stay vigilant against COVID-19.
 
-We are releasing the face segmentation algorithms that the VigilantGantry uses to identify potential missed out causes by current thermal systems (due to occlusion from fringe, cap, head-gear).
+We are releasing the face segmentation algorithm that the VigilantGantry uses to identify potential missed out causes by current thermal systems (due to occlusion from fringe, cap, head-gear).
 
  
 ## Trial at NUS

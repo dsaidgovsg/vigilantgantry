@@ -6,6 +6,7 @@ This PersonDetector class performs human detection and return a list of bounding
 
 
 """
+import logging
 
 import torch
 import numpy as np
@@ -13,6 +14,13 @@ from person_detector.util import load_classes, write_results
 from person_detector.darknet import Darknet
 from person_detector.preprocess import prep_image
 from torch.autograd import Variable
+
+from standard_logs.logger import setup_logging
+
+
+setup_logging()
+logger = logging.getLogger(name="person_detecor:person_detector.py")
+logger = logging.getLogger(__name__)
 
 
 class PersonDetector:

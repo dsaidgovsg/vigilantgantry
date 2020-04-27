@@ -4,14 +4,21 @@
 ~~~~~~~~~~~~~~~
 This FaceDetector module performs face detection and return face bounding box.
 """
+import logging
+
 import torch
+import numpy as np
 
 from face_detector.vision.ssd.config.fd_config import define_img_size
 from face_detector.vision.ssd.mb_tiny_RFB_fd import (
     create_Mb_Tiny_RFB_fd,
     create_Mb_Tiny_RFB_fd_predictor,
 )
-import numpy as np
+from standard_logs.logger import setup_logging
+
+setup_logging()
+logger = logging.getLogger(name="video_processor:video_processor.py")
+logger = logging.getLogger(__name__)
 
 
 class FaceDetector:

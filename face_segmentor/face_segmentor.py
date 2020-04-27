@@ -5,13 +5,21 @@
 This FaceSegmentor module performs face segmentation.
 
 """
+import logging
 import PIL
+
 import cv2
 import torch
 import numpy as np
 from torchvision import transforms
-from face_segmentor.nets.MobileNetV2_unet import MobileNetV2_unet
+
+from standard_logs.logger import setup_logging
 from pipeline.utils import *
+from face_segmentor.nets.MobileNetV2_unet import MobileNetV2_unet
+
+setup_logging()
+logger = logging.getLogger(name="video_processor:video_processor.py")
+logger = logging.getLogger(__name__)
 
 
 class FaceSegmentor:
