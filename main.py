@@ -17,11 +17,13 @@ from face_detector.face_detector import FaceDetector
 from face_segmentor.face_segmentor import FaceSegmentor
 
 
-VIDEO_SOURCE = os.getenv("VIDEO_SOURCE", "sample/sample.mp4")
+VIDEO_SOURCE = os.getenv("VIDEO_SOURCE", default="sample/sample.mp4")
+VIDEO_WIDTH = int(os.getenv("VIDEO_WIDTH", default=1280))
+VIDEO_HEIGHT = int(os.getenv("VIDEO_HEIGHT", default=720))
 PERSON_DETECTION_ROI_BOUNDARY = tuple(
-    os.getenv("PERSON_DETECTION_ROI_BOUNDARY", default=((0, 0), (1280, 720)))
+    os.getenv("PERSON_DETECTION_ROI_BOUNDARY", default=((10, 10), (1180, 710)))
 )
-PERSON_DETECTION_INTERCEPT_BOUNDARY = list(
+FACE_SEGMENTATION_TRIGGER_BOUNDARY = list(
     os.getenv("PERSON_DETECTION_INTERCEPT_BOUNDARY", default=((600, 350), (700, 450)))
 )
 GANTRY_ID = int(os.getenv("GANTRY_ID", default=1))
@@ -37,33 +39,37 @@ if __name__ == "__main__":
         "--video_source",
         dest="video_source",
         type=str,
-        default="sample/sample.mp4",
+        default=VIDEO_SOURCE,
         help="insert either video file path (e.g. \home\), rtsp address (e.g. 'rtsp:\\') or webcam id (e.g. '0')",
     )
 
-    parser.add_argument("--video_width", type=int, default=1280, help="video width")
+    parser.add_argument(
+        "--video_width", type=int, default=VIDEO_WIDTH, help="video width"
+    )
 
-    parser.add_argument("--video_height", type=int, default=720, help="video height")
+    parser.add_argument(
+        "--video_height", type=int, default=VIDEO_HEIGHT, help="video height"
+    )
 
     parser.add_argument(
         "--person_detect_roi_boundary",
-        type=str,
+        type=tuple,
         default=PERSON_DETECTION_ROI_BOUNDARY,
-        help="insert coordinates in which persons will be detection",
+        help="Insert coordinates in which person detection will be triggered",
     )
     parser.add_argument(
-        "--person_detect_intercept_boundary",
-        type=str,
-        default=PERSON_DETECTION_INTERCEPT_BOUNDARY,
-        help="insert coordinates in which faces will be detection",
+        "--face_segmentation_trigger_boundary",
+        type=tuple,
+        default=FACE_SEGMENTATION_TRIGGER_BOUNDARY,
+        help="Insert coordinates in which face segmentation will be triggered",
     )
     parser.add_argument(
-        "--gantry_id", type=str, default=GANTRY_ID, help="insert gantry id"
+        "--gantry_id", type=int, default=GANTRY_ID, help="insert gantry id"
     )
 
     parser.add_argument(
         "--face_seg_threshold_value",
-        type=int,
+        type=float,
         default=FACE_SEG_THRESHOLD_VALUE,
         help="insert proportion of exposed face over total face area",
     )
@@ -96,7 +102,7 @@ if __name__ == "__main__":
         video_width=args.video_width,
         video_height=args.video_height,
         person_detect_roi_boundary=args.person_detect_roi_boundary,
-        person_detect_intercept_boundary=args.person_detect_intercept_boundary,
+        face_segmentation_trigger_boundary=args.face_segmentation_trigger_boundary,
         gantry_id=args.gantry_id,
         face_seg_threshold_value=args.face_seg_threshold_value,
         full_screen_display=args.full_screen_display,

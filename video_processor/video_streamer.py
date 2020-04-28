@@ -22,13 +22,9 @@ logger = logging.getLogger(__name__)
 
 
 class VideoStreamer:
-    def __init__(self, video_source, video_width, video_height):
+    def __init__(self, video_source):
         self.video_source = video_source
-        self.video_width = video_width
-        self.video_height = video_height
         self.cap = cv2.VideoCapture(self.video_source)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, video_width)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, video_height)
         self.grabbed, self.frame = self.cap.read()
         self.started = False
         self.read_lock = threading.Lock()

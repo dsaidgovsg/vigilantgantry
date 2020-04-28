@@ -30,13 +30,12 @@ def run_pipeline(
     face_segmentor,
     face_seg_threshold_value,
     person_detect_roi_boundary,
-    person_detect_intercept_boundary,
+    face_segmentation_trigger_boundary,
     gantry_id,
 ):
     """
-    run_pipeline Connects all the various AI algo together
+    A pipeline to run person detection, face detection and face segmentation.
 
-    [extended_summary]
 
     :param frame: Video frame
     :type frame: np.array
@@ -50,15 +49,15 @@ def run_pipeline(
     :type face_seg_threshold_value: float
     :param person_detect_roi_boundary: ROI to detect person
     :type person_detect_roi_boundary: ruple
-    :param person_detect_intercept_boundary: ROI to detect face
-    :type person_detect_intercept_boundary: tuple
+    :param face_segmentation_trigger_boundary: ROI to detect face
+    :type face_segmentation_trigger_boundary: tuple
     :param gantry_id: ID of gantry 
     :type gantry_id: int
     :return: Processed Video frame
     :rtype: np.array
     """
     intercept_zone = get_intercept_zone(
-        person_detect_roi_boundary, person_detect_intercept_boundary
+        person_detect_roi_boundary, face_segmentation_trigger_boundary
     )
     cv2.rectangle(
         frame,
@@ -71,9 +70,7 @@ def run_pipeline(
     for person in persons:
         bbox = np.array(person).astype(int)
         if (bbox > 1).all():
-            if if_point_intersect_with_rect(
-                person_detect_intercept_boundary, get_centriod(bbox)
-            ):
+            if if_point_intersect_with_rect(intercept_zone, get_centriod(bbox)):
                 run_heuristic(
                     frame,
                     bbox,
@@ -90,7 +87,7 @@ def run_heuristic(
     frame, bbox, threshold_value, face_detector, face_segmentor, gantry_id
 ):
     """
-    run_heuristic Performs logic
+    Performs business logic for face segmentation.
 
 
     :param frame:  Video frame

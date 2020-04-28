@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 class PersonDetector:
     """
     PersonDetector class that is configurable and returns persons bounding boxes. 
+
     """
 
     def __init__(

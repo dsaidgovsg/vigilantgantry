@@ -23,22 +23,15 @@ def get_centriod(x):
 
 
 def if_point_intersect_with_rect(rect, pt):
-    return (
-        pt[0] > rect[0][0]
-        and pt[0] < rect[1][0]
-        and pt[1] > rect[0][1]
-        and pt[1] < rect[1][1]
-    )
+    return pt[0] > rect[0] and pt[0] < rect[2] and pt[1] > rect[1] and pt[1] < rect[3]
 
 
 def get_frame_inside_roi(frame_inside_roi, bbox):
     f_min_x, f_min_y, f_max_x, f_max_y = bbox
     h, w = f_max_y - f_min_y, f_max_x - f_min_x
-    frame_inside_roi_x = frame_inside_roi[:, :, ::-1]
-    frame_inside_roi_y = frame_inside_roi_x[
-        f_min_y : f_min_y + h, f_min_x : f_min_x + w
-    ]
-    return frame_inside_roi_y
+    frame_inside_roi = frame_inside_roi[:, :, ::-1]
+    frame_inside_roi = frame_inside_roi[f_min_y : f_min_y + h, f_min_x : f_min_x + w]
+    return frame_inside_roi
 
 
 def push_output_result(gantry_id, verify):
@@ -57,12 +50,12 @@ def push_output_result(gantry_id, verify):
     return output_json
 
 
-def get_intercept_zone(person_detect_roi_boundary, person_detect_intercept_boundary):
+def get_intercept_zone(person_detect_roi_boundary, face_segmentation_trigger_boundary):
     return (
-        person_detect_intercept_boundary[0][0] - person_detect_roi_boundary[0][0],
-        person_detect_intercept_boundary[0][1] - person_detect_roi_boundary[0][1],
-        person_detect_intercept_boundary[1][0] - person_detect_roi_boundary[0][0],
-        person_detect_intercept_boundary[1][1] - person_detect_roi_boundary[0][1],
+        face_segmentation_trigger_boundary[0][0] - person_detect_roi_boundary[0][0],
+        face_segmentation_trigger_boundary[0][1] - person_detect_roi_boundary[0][1],
+        face_segmentation_trigger_boundary[1][0] - person_detect_roi_boundary[0][0],
+        face_segmentation_trigger_boundary[1][1] - person_detect_roi_boundary[0][1],
     )
 
 
@@ -90,3 +83,15 @@ def display_bbox(frame, bbox, text, color="green"):
     )
 
     return frame
+
+
+class Error(Exception):
+    """Base class for other exceptions"""
+
+    pass
+
+
+class FaceSegmentationBoundaryError(Error):
+    """ Face segmentation trigger zone cooordinates must be within Person detection ROI coordinates """
+
+    pass
