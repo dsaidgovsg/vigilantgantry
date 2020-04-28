@@ -107,13 +107,15 @@ def run_heuristic(
     """
     frame_inside_roi = get_frame_inside_roi(frame, xywh2xyxy(bbox))
     boxes = face_detector.get_face_bbox(frame_inside_roi)
-    computed_seg_value, _ = face_segmentor.get_segmentation_value(
-        frame_inside_roi, xyxy2xywh(boxes[0])
-    )
-    if computed_seg_value > threshold_value:
-        frame = display_bbox(frame, bbox, "NOT COVERED")
-        output = push_output_result(gantry_id, 1)
-    else:
-        frame = display_bbox(frame, bbox, "COVERED", "red")
-        output = push_output_result(gantry_id, 0)
+    output = 0
+    if len(boxes) > 0:
+        computed_seg_value, _ = face_segmentor.get_segmentation_value(
+            frame_inside_roi, xyxy2xywh(boxes[0])
+        )
+        if computed_seg_value > threshold_value:
+            frame = display_bbox(frame, bbox, "NOT COVERED")
+            output = push_output_result(gantry_id, 1)
+        else:
+            frame = display_bbox(frame, bbox, "COVERED", "red")
+            output = push_output_result(gantry_id, 0)
     return output
