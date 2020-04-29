@@ -41,7 +41,7 @@ def if_webcam(video_source):
 
 def flatten(tuple):
     """
-    Flattern tuple
+    Flattern nested tuple
 
     :param t: Nested tuple
     :type t: tuple
