@@ -109,7 +109,3 @@ class FaceSegmentor:
             f_min_x : f_min_x + masked_img.shape[1],
         ] = masked_img
         return image
-
-
-def xywhTOx1y1x2y2_bbox(x):
-    return [x[0], x[1], x[0] + x[2], x[1] + x[3]]
