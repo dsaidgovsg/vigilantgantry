@@ -34,6 +34,28 @@ class VideoProcessor:
         face_seg_threshold_value,
         full_screen_display,
     ):
+        """
+        __init__ [summary]
+
+        [extended_summary]
+
+        :param video_source: [description]
+        :type video_source: [type]
+        :param video_width: [description]
+        :type video_width: [type]
+        :param video_height: [description]
+        :type video_height: [type]
+        :param person_detect_roi_boundary: [description]
+        :type person_detect_roi_boundary: [type]
+        :param face_segmentation_trigger_boundary: [description]
+        :type face_segmentation_trigger_boundary: [type]
+        :param gantry_id: [description]
+        :type gantry_id: [type]
+        :param face_seg_threshold_value: [description]
+        :type face_seg_threshold_value: [type]
+        :param full_screen_display: [description]
+        :type full_screen_display: [type]
+        """
         self.video_source = video_source
         self.person_detect_roi_boundary = person_detect_roi_boundary
         self.face_segmentation_trigger_boundary = face_segmentation_trigger_boundary
@@ -79,6 +101,7 @@ class VideoProcessor:
                 break
         vid.stop()
         cv2.destroyAllWindows()
+        return None
 
     def process_frame(self, frame):
         """

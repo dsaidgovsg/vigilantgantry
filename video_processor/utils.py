@@ -49,8 +49,16 @@ def if_webcam_id_is_negatie_or_too_large(video_source):
         )
 
 
-def flatten(t):
-    for x in t:
+def flatten(tuple):
+    """
+    Flattern tuple
+
+    :param t: Nested tuple
+    :type t: tuple
+    :yield: Flat tuple
+    :rtype: tuple
+    """
+    for x in tuple:
         if not isinstance(x, Iterable):
             yield x
         else:
