@@ -24,7 +24,7 @@ PERSON_DETECTION_ROI_BOUNDARY = tuple(
     os.getenv("PERSON_DETECTION_ROI_BOUNDARY", default=((10, 10), (1180, 710)))
 )
 FACE_SEGMENTATION_TRIGGER_BOUNDARY = list(
-    os.getenv("PERSON_DETECTION_INTERCEPT_BOUNDARY", default=((11, 11), (700, 450)))
+    os.getenv("PERSON_DETECTION_INTERCEPT_BOUNDARY", default=((600, 350), (700, 450)))
 )
 GANTRY_ID = int(os.getenv("GANTRY_ID", default=1))
 FACE_SEG_THRESHOLD_VALUE = float(os.getenv("FACE_SEG_THRESHOLD_VALUE", default=0.5))
@@ -55,13 +55,13 @@ if __name__ == "__main__":
         "--person_detect_roi_boundary",
         type=tuple,
         default=PERSON_DETECTION_ROI_BOUNDARY,
-        help="Insert coordinates in which person detection will be triggered",
+        help="Insert coordinates in nested tuple ((xmin, ymin), (xmax, ymax)) in which person detection will be triggered",
     )
     parser.add_argument(
         "--face_segmentation_trigger_boundary",
         type=tuple,
         default=FACE_SEGMENTATION_TRIGGER_BOUNDARY,
-        help="Insert coordinates in which face segmentation will be triggered",
+        help="Insert coordinates in nested tuple ((xmin, ymin), (xmax, ymax)) which face segmentation will be triggered",
     )
     parser.add_argument(
         "--gantry_id", type=int, default=GANTRY_ID, help="insert gantry id"

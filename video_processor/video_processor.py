@@ -13,7 +13,7 @@ from vidgear.gears import CamGear
 
 from standard_logs.logger import setup_logging
 from video_processor.video_streamer import VideoStreamer
-from video_processor.utils import if_rtsp, if_webcam
+from video_processor.utils import if_rtsp, if_webcam, if_face_trigger_inside_person_roi
 
 from pipeline.pipeline import run_pipeline
 
@@ -40,6 +40,10 @@ class VideoProcessor:
         self.gantry_id = gantry_id
         self.face_seg_threshold_value = face_seg_threshold_value
         self.full_screen_display = full_screen_display
+
+        if_face_trigger_inside_person_roi(
+            person_detect_roi_boundary, face_segmentation_trigger_boundary
+        )
 
     def process_video(self, person_detector, face_detector, face_segmentor):
         """

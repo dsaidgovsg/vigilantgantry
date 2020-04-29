@@ -83,15 +83,3 @@ def display_bbox(frame, bbox, text, color="green"):
     )
 
     return frame
-
-
-class Error(Exception):
-    """Base class for other exceptions"""
-
-    pass
-
-
-class FaceSegmentationBoundaryError(Error):
-    """ Face segmentation trigger zone cooordinates must be within Person detection ROI coordinates """
-
-    pass
