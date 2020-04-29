@@ -4,7 +4,7 @@
 ~~~~~~~~~~~~~~~
 The run_pipeline and run_heuristic connects the various AI algo together.
 
-
+Author: GovTech Singapore
 """
 import cv2
 import colorsys
@@ -34,7 +34,7 @@ def run_pipeline(
     gantry_id,
 ):
     """
-    A pipeline to run person detection, face detection and face segmentation.
+    Pipeline to Run Person Detection, Face Detection and Face Segmentation.
 
 
     :param frame: Video frame
@@ -70,7 +70,9 @@ def run_pipeline(
     for person in persons:
         bbox = np.array(person).astype(int)
         if (bbox > 1).all():
-            if if_point_intersect_with_rect(intercept_zone, get_centriod(bbox)):
+            if if_point_intersect_with_rect(
+                intercept_zone, get_centriod(xywh2xyxy(bbox))
+            ):
                 run_heuristic(
                     frame,
                     bbox,
@@ -79,7 +81,7 @@ def run_pipeline(
                     face_segmentor,
                     gantry_id,
                 )
-                cv2.circle(frame, get_centriod(bbox), 10, (0, 0, 255), -1)
+                cv2.circle(frame, get_centriod(xywh2xyxy(bbox)), 10, (0, 0, 255), -1)
     return frame
 
 
@@ -87,7 +89,7 @@ def run_heuristic(
     frame, bbox, threshold_value, face_detector, face_segmentor, gantry_id
 ):
     """
-    Performs business logic for face segmentation.
+    Logic for Face Segmentation
 
 
     :param frame:  Video frame

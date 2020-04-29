@@ -33,7 +33,7 @@ docker run --rm --runtime=nvidia -ti -e DISPLAY=$DISPLAY -e  DISPLAY=$DISPLAY -v
 
 ## Acknowledgement 
 * [Person Detection](https://github.com/eriklindernoren/PyTorch-YOLOv3)
-* [Face Detection](Ultra-Light-Fast-Generic-Face-Detector-1MB)
+* [Face Detection](https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB)
 * [Face Segmentation](https://github.com/kampta/face-seg)
 
 ## Suggestion

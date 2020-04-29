@@ -1,5 +1,12 @@
-# from https://github.com/amdegroot/ssd.pytorch
+# -*- coding: utf-8 -*-
 
+"""
+~~~~~~~~~~~~~~~
+Face detection module
+
+
+Credits: https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB and https://github.com/amdegroot/ssd.pytorch
+"""
 
 import types
 
@@ -7,7 +14,8 @@ import cv2
 import numpy as np
 import torch
 from numpy import random
-#from torchvision import transforms
+
+# from torchvision import transforms
 
 
 def intersect(box_a, box_b):
@@ -29,10 +37,8 @@ def jaccard_numpy(box_a, box_b):
         jaccard overlap: Shape: [box_a.shape[0], box_a.shape[1]]
     """
     inter = intersect(box_a, box_b)
-    area_a = ((box_a[:, 2] - box_a[:, 0]) *
-              (box_a[:, 3] - box_a[:, 1]))  # [A,B]
-    area_b = ((box_b[2] - box_b[0]) *
-              (box_b[3] - box_b[1]))  # [A,B]
+    area_a = (box_a[:, 2] - box_a[:, 0]) * (box_a[:, 3] - box_a[:, 1])  # [A,B]
+    area_b = (box_b[2] - box_b[0]) * (box_b[3] - box_b[1])  # [A,B]
     union = area_a + area_b - inter
     return inter / union  # [A,B]
 
@@ -49,10 +55,8 @@ def object_converage_numpy(box_a, box_b):
         jaccard overlap: Shape: [box_a.shape[0], box_a.shape[1]]
     """
     inter = intersect(box_a, box_b)
-    area_a = ((box_a[:, 2] - box_a[:, 0]) *
-              (box_a[:, 3] - box_a[:, 1]))  # [A,B]
-    area_b = ((box_b[2] - box_b[0]) *
-              (box_b[3] - box_b[1]))  # [A,B]
+    area_a = (box_a[:, 2] - box_a[:, 0]) * (box_a[:, 3] - box_a[:, 1])  # [A,B]
+    area_b = (box_b[2] - box_b[0]) * (box_b[3] - box_b[1])  # [A,B]
     return inter / area_a  # [A,B]
 
 
@@ -139,8 +143,7 @@ class Resize(object):
         self.size = size
 
     def __call__(self, image, boxes=None, labels=None):
-        image = cv2.resize(image, (self.size[0],
-                                   self.size[1]))
+        image = cv2.resize(image, (self.size[0], self.size[1]))
         return image, boxes, labels
 
 
@@ -173,9 +176,7 @@ class RandomHue(object):
 
 class RandomLightingNoise(object):
     def __init__(self):
-        self.perms = ((0, 1, 2), (0, 2, 1),
-                      (1, 0, 2), (1, 2, 0),
-                      (2, 0, 1), (2, 1, 0))
+        self.perms = ((0, 1, 2), (0, 2, 1), (1, 0, 2), (1, 2, 0), (2, 0, 1), (2, 1, 0))
 
     def __call__(self, image, boxes=None, labels=None):
         if random.randint(2):
@@ -191,15 +192,15 @@ class ConvertColor(object):
         self.current = current
 
     def __call__(self, image, boxes=None, labels=None):
-        if self.current == 'BGR' and self.transform == 'HSV':
+        if self.current == "BGR" and self.transform == "HSV":
             image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-        elif self.current == 'RGB' and self.transform == 'HSV':
+        elif self.current == "RGB" and self.transform == "HSV":
             image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
-        elif self.current == 'BGR' and self.transform == 'RGB':
+        elif self.current == "BGR" and self.transform == "RGB":
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        elif self.current == 'HSV' and self.transform == 'BGR':
+        elif self.current == "HSV" and self.transform == "BGR":
             image = cv2.cvtColor(image, cv2.COLOR_HSV2BGR)
-        elif self.current == 'HSV' and self.transform == "RGB":
+        elif self.current == "HSV" and self.transform == "RGB":
             image = cv2.cvtColor(image, cv2.COLOR_HSV2RGB)
         else:
             raise NotImplementedError
@@ -236,12 +237,20 @@ class RandomBrightness(object):
 
 class ToCV2Image(object):
     def __call__(self, tensor, boxes=None, labels=None):
-        return tensor.cpu().numpy().astype(np.float32).transpose((1, 2, 0)), boxes, labels
+        return (
+            tensor.cpu().numpy().astype(np.float32).transpose((1, 2, 0)),
+            boxes,
+            labels,
+        )
 
 
 class ToTensor(object):
     def __call__(self, cvimage, boxes=None, labels=None):
-        return torch.from_numpy(cvimage.astype(np.float32)).permute(2, 0, 1), boxes, labels
+        return (
+            torch.from_numpy(cvimage.astype(np.float32)).permute(2, 0, 1),
+            boxes,
+            labels,
+        )
 
 
 class RandomSampleCrop(object):
@@ -281,9 +290,9 @@ class RandomSampleCrop(object):
 
             min_iou, max_iou = mode
             if min_iou is None:
-                min_iou = float('-inf')
+                min_iou = float("-inf")
             if max_iou is None:
-                max_iou = float('inf')
+                max_iou = float("inf")
 
             # max trails (50)
             for _ in range(50):
@@ -310,8 +319,7 @@ class RandomSampleCrop(object):
                     continue
 
                 # cut the crop from the image
-                current_image = current_image[rect[1]:rect[3], rect[0]:rect[2],
-                                :]
+                current_image = current_image[rect[1] : rect[3], rect[0] : rect[2], :]
 
                 # keep overlap with gt box IF center in sampled patch
                 centers = (boxes[:, :2] + boxes[:, 2:]) / 2.0
@@ -336,13 +344,11 @@ class RandomSampleCrop(object):
                 current_labels = labels[mask]
 
                 # should we use the box left and top corner or the crop's
-                current_boxes[:, :2] = np.maximum(current_boxes[:, :2],
-                                                  rect[:2])
+                current_boxes[:, :2] = np.maximum(current_boxes[:, :2], rect[:2])
                 # adjust to crop (by substracting crop's left,top)
                 current_boxes[:, :2] -= rect[:2]
 
-                current_boxes[:, 2:] = np.minimum(current_boxes[:, 2:],
-                                                  rect[2:])
+                current_boxes[:, 2:] = np.minimum(current_boxes[:, 2:], rect[2:])
                 # adjust to crop (by substracting crop's left,top)
                 current_boxes[:, 2:] -= rect[:2]
 
@@ -368,7 +374,6 @@ class RandomSampleCrop_v2(object):
             # using entire original input image
             None,
             # sample a patch s.t. MIN jaccard w/ obj in .1,.3,.4,.7,.9
-
             # randomly sample a patch
             (1, None),
             (1, None),
@@ -386,9 +391,9 @@ class RandomSampleCrop_v2(object):
 
             min_iou, max_iou = mode
             if min_iou is None:
-                min_iou = float('-inf')
+                min_iou = float("-inf")
             if max_iou is None:
-                max_iou = float('inf')
+                max_iou = float("inf")
 
             # max trails (50)
             for _ in range(50):
@@ -415,8 +420,7 @@ class RandomSampleCrop_v2(object):
                     continue
 
                 # cut the crop from the image
-                current_image = current_image[rect[1]:rect[3], rect[0]:rect[2],
-                                :]
+                current_image = current_image[rect[1] : rect[3], rect[0] : rect[2], :]
 
                 # keep overlap with gt box IF center in sampled patch
                 centers = (boxes[:, :2] + boxes[:, 2:]) / 2.0
@@ -441,13 +445,11 @@ class RandomSampleCrop_v2(object):
                 current_labels = labels[mask]
 
                 # should we use the box left and top corner or the crop's
-                current_boxes[:, :2] = np.maximum(current_boxes[:, :2],
-                                                  rect[:2])
+                current_boxes[:, :2] = np.maximum(current_boxes[:, :2], rect[:2])
                 # adjust to crop (by substracting crop's left,top)
                 current_boxes[:, :2] -= rect[:2]
 
-                current_boxes[:, 2:] = np.minimum(current_boxes[:, 2:],
-                                                  rect[2:])
+                current_boxes[:, 2:] = np.minimum(current_boxes[:, 2:], rect[2:])
                 # adjust to crop (by substracting crop's left,top)
                 current_boxes[:, 2:] -= rect[:2]
 
@@ -468,11 +470,12 @@ class Expand(object):
         top = random.uniform(0, height * ratio - height)
 
         expand_image = np.zeros(
-            (int(height * ratio), int(width * ratio), depth),
-            dtype=image.dtype)
+            (int(height * ratio), int(width * ratio), depth), dtype=image.dtype
+        )
         expand_image[:, :, :] = self.mean
-        expand_image[int(top):int(top + height),
-        int(left):int(left + width)] = image
+        expand_image[
+            int(top) : int(top + height), int(left) : int(left + width)
+        ] = image
         image = expand_image
 
         boxes = boxes.copy()
@@ -522,11 +525,11 @@ class PhotometricDistort(object):
     def __init__(self):
         self.pd = [
             RandomContrast(),  # RGB
-            ConvertColor(current="RGB", transform='HSV'),  # HSV
+            ConvertColor(current="RGB", transform="HSV"),  # HSV
             RandomSaturation(),  # HSV
             RandomHue(),  # HSV
-            ConvertColor(current='HSV', transform='RGB'),  # RGB
-            RandomContrast()  # RGB
+            ConvertColor(current="HSV", transform="RGB"),  # RGB
+            RandomContrast(),  # RGB
         ]
         self.rand_brightness = RandomBrightness()
         self.rand_light_noise = RandomLightingNoise()

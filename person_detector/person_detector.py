@@ -4,7 +4,7 @@
 ~~~~~~~~~~~~~~~
 This PersonDetector class performs human detection and return a list of bounding boxes.
 
-
+Author: GovTech Singapore
 """
 import logging
 

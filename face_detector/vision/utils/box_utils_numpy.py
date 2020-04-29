@@ -1,8 +1,17 @@
+# -*- coding: utf-8 -*-
+
+"""
+~~~~~~~~~~~~~~~
+Face detection module
+
+
+Credits: https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB
+"""
+
 import numpy as np
 
 
-def convert_locations_to_boxes(locations, priors, center_variance,
-                               size_variance):
+def convert_locations_to_boxes(locations, priors, center_variance, size_variance):
     """Convert regressional location results of SSD into boxes in the form of (center_x, center_y, h, w).
 
     The conversion:
@@ -21,20 +30,31 @@ def convert_locations_to_boxes(locations, priors, center_variance,
     # priors can have one dimension less.
     if len(priors.shape) + 1 == len(locations.shape):
         priors = np.expand_dims(priors, 0)
-    return np.concatenate([
-        locations[..., :2] * center_variance * priors[..., 2:] + priors[..., :2],
-        np.exp(locations[..., 2:] * size_variance) * priors[..., 2:]
-    ], axis=len(locations.shape) - 1)
+    return np.concatenate(
+        [
+            locations[..., :2] * center_variance * priors[..., 2:] + priors[..., :2],
+            np.exp(locations[..., 2:] * size_variance) * priors[..., 2:],
+        ],
+        axis=len(locations.shape) - 1,
+    )
 
 
-def convert_boxes_to_locations(center_form_boxes, center_form_priors, center_variance, size_variance):
+def convert_boxes_to_locations(
+    center_form_boxes, center_form_priors, center_variance, size_variance
+):
     # priors can have one dimension less
     if len(center_form_priors.shape) + 1 == len(center_form_boxes.shape):
         center_form_priors = np.expand_dims(center_form_priors, 0)
-    return np.concatenate([
-        (center_form_boxes[..., :2] - center_form_priors[..., :2]) / center_form_priors[..., 2:] / center_variance,
-        np.log(center_form_boxes[..., 2:] / center_form_priors[..., 2:]) / size_variance
-    ], axis=len(center_form_boxes.shape) - 1)
+    return np.concatenate(
+        [
+            (center_form_boxes[..., :2] - center_form_priors[..., :2])
+            / center_form_priors[..., 2:]
+            / center_variance,
+            np.log(center_form_boxes[..., 2:] / center_form_priors[..., 2:])
+            / size_variance,
+        ],
+        axis=len(center_form_boxes.shape) - 1,
+    )
 
 
 def area_of(left_top, right_bottom):
@@ -71,15 +91,20 @@ def iou_of(boxes0, boxes1, eps=1e-5):
 
 
 def center_form_to_corner_form(locations):
-    return np.concatenate([locations[..., :2] - locations[..., 2:] / 2,
-                           locations[..., :2] + locations[..., 2:] / 2], len(locations.shape) - 1)
+    return np.concatenate(
+        [
+            locations[..., :2] - locations[..., 2:] / 2,
+            locations[..., :2] + locations[..., 2:] / 2,
+        ],
+        len(locations.shape) - 1,
+    )
 
 
 def corner_form_to_center_form(boxes):
-    return np.concatenate([
-        (boxes[..., :2] + boxes[..., 2:]) / 2,
-        boxes[..., 2:] - boxes[..., :2]
-    ], len(boxes.shape) - 1)
+    return np.concatenate(
+        [(boxes[..., :2] + boxes[..., 2:]) / 2, boxes[..., 2:] - boxes[..., :2]],
+        len(boxes.shape) - 1,
+    )
 
 
 def hard_nms(box_scores, iou_threshold, top_k=-1, candidate_size=200):
@@ -110,10 +135,7 @@ def hard_nms(box_scores, iou_threshold, top_k=-1, candidate_size=200):
         # indexes = indexes[1:]
         indexes = indexes[:-1]
         rest_boxes = boxes[indexes, :]
-        iou = iou_of(
-            rest_boxes,
-            np.expand_dims(current_box, axis=0),
-        )
+        iou = iou_of(rest_boxes, np.expand_dims(current_box, axis=0))
         indexes = indexes[iou <= iou_threshold]
 
     return box_scores[picked, :]

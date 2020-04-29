@@ -4,6 +4,7 @@
 ~~~~~~~~~~~~~~~
 This FaceSegmentor module performs face segmentation.
 
+Author: GovTech Singapore
 """
 import logging
 import PIL
@@ -24,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 class FaceSegmentor:
     """
-     FaceSegmentor class that is configurable and returns amount of face skin detected. 
+     FaceSegmentor class that returns amount of face skin detected. 
 
     """
 
@@ -98,7 +99,7 @@ class FaceSegmentor:
         :return: Frame
         :rtype: np.array
         """
-        f_min_x, f_min_y, f_max_x, f_max_y = xywhTOx1y1x2y2_bbox(face_coord)
+        f_min_x, f_min_y, f_max_x, f_max_y = xywh2xyxy(face_coord)
         masked_img_b = np.where(masked_img_b == 1, 255, masked_img_b)
         masked_img_b = np.where(masked_img_b == 2, 255, masked_img_b)
         masked_img = cv2.cvtColor(masked_img_b, cv2.COLOR_GRAY2BGR)

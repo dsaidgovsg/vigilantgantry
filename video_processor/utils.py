@@ -4,14 +4,14 @@
 ~~~~~~~~~~~~~~~
 This files contains helper functions for the VideoProcesor module
 
-
+Author: GovTech Singapore
 """
 from collections import namedtuple, Iterable
 
 
 def if_rtsp(video_source):
     """
-    if_rtsp: Check if video source is RTSP
+    Check if video source is RTSP.
 
     :param video_source: video source 
     :type video_source: str
@@ -23,21 +23,20 @@ def if_rtsp(video_source):
 
 def if_webcam(video_source):
     """
-    Check if video source is from webcam
+    Check if video source is from webcam.
 
     :param video_source: video source
     :type video_source: str
     :return: True if video source is from webcam id string
     :rtype: str
     """
-    if_webcam_id_is_negatie_or_too_large(video_source)
 
     return video_source.isdigit()
 
 
-def if_webcam_id_is_negatie_or_too_large(video_source):
+def if_webcam_id_is_negative_or_too_large(video_source):
     """
-    Check if webcam value is negative
+    Check if webcam value is negative.
 
     :param video_source: Webcam device id
     :type video_source: str
@@ -66,6 +65,16 @@ def flatten(tuple):
 
 
 def contains(person_rect_roi, face_trigger_boundary):
+    """
+    Check if face segmentation trigger boundary is inside a person detection ROI.
+
+    :param person_rect_roi: Coordinates of person detection ROI
+    :type person_rect_roi: RectangleCoordinate
+    :param face_trigger_boundary: Coordinates of trigger boundary for face segmentation
+    :type face_trigger_boundary: RectangleCoordinate
+    :return: True if face segmentation trigger boundary is inside a person detection ROI
+    :rtype: bool
+    """
     return (
         person_rect_roi.xmin
         < face_trigger_boundary.xmin
@@ -81,6 +90,15 @@ def contains(person_rect_roi, face_trigger_boundary):
 def if_face_trigger_inside_person_roi(
     person_detect_roi_boundary, face_segmentation_trigger_boundary
 ):
+    """
+    Raises an exception if face segmentation trigger boundary is not inside a person detection ROI.
+
+    :param person_detect_roi_boundary: Coordinates of person detection ROI
+    :type person_detect_roi_boundary: tuple (nested)
+    :param face_segmentation_trigger_boundary: Coordinates of trigger boundary for face segmentation
+    :type face_segmentation_trigger_boundary: tuple (nested)
+    :raises Exception: Warning if face segmentation trigger boundary is not inside a person detection ROI.
+    """
     RectangleCoordinate = namedtuple("rect", "xmin ymin xmax ymax")
     person_rect_roi = RectangleCoordinate(*tuple(flatten(person_detect_roi_boundary)))
     face_trigger_boundary = RectangleCoordinate(

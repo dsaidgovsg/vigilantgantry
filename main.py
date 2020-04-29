@@ -3,6 +3,8 @@
 """
 ~~~~~~~~~~~~~~~
 This file is the entrypoint to the VigilantGantry Face Segmentation AI Engine program.
+
+Author: GovTech Singapore
 """
 import argparse, os
 

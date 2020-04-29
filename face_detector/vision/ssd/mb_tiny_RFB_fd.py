@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+"""
+~~~~~~~~~~~~~~~
+Face detection module
+
+
+Credits: https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB
+"""
 from torch.nn import Conv2d, Sequential, ModuleList, ReLU
 
 from face_detector.vision.nn.mb_tiny_RFB import Mb_Tiny_RFB

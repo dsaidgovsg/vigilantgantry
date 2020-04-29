@@ -3,6 +3,8 @@
 """
 ~~~~~~~~~~~~~~~
 This FaceDetector module performs face detection and return face bounding box.
+
+Author: GovTech Singapore
 """
 import logging
 

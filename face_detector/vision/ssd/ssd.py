@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+"""
+~~~~~~~~~~~~~~~
+Face detection module
+
+
+Credits: https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB
+"""
 from collections import namedtuple
 from typing import List, Tuple
 

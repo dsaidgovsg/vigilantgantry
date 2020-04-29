@@ -4,7 +4,7 @@
 ~~~~~~~~~~~~~~~
 This video processor module ingest video streams from either RTSP, webcam or video file and processes
 
-
+Author: GovTech Singapore
 """
 import logging
 
@@ -35,26 +35,25 @@ class VideoProcessor:
         full_screen_display,
     ):
         """
-        __init__ [summary]
 
-        [extended_summary]
+        Initialises VideoProcess Class
 
-        :param video_source: [description]
-        :type video_source: [type]
-        :param video_width: [description]
-        :type video_width: [type]
-        :param video_height: [description]
-        :type video_height: [type]
-        :param person_detect_roi_boundary: [description]
-        :type person_detect_roi_boundary: [type]
-        :param face_segmentation_trigger_boundary: [description]
-        :type face_segmentation_trigger_boundary: [type]
-        :param gantry_id: [description]
-        :type gantry_id: [type]
-        :param face_seg_threshold_value: [description]
-        :type face_seg_threshold_value: [type]
-        :param full_screen_display: [description]
-        :type full_screen_display: [type]
+        :param video_source: Video source path from video file, RTSP or webcam
+        :type video_source: str
+        :param video_width: Video source width
+        :type video_width:  int
+        :param video_height: Video source height
+        :type video_height: int
+        :param person_detect_roi_boundary: ROI for person detection 
+        :type person_detect_roi_boundary: tuple
+        :param face_segmentation_trigger_boundary: Trigger boundary for face segmentation
+        :type face_segmentation_trigger_boundary: tuple
+        :param gantry_id: Gantry ID
+        :type gantry_id: int
+        :param face_seg_threshold_value: Threshold for proportion of exposed face over total face area
+        :type face_seg_threshold_value:  Float
+        :param full_screen_display: Display fullscreen
+        :type full_screen_display: True
         """
         self.video_source = video_source
         self.person_detect_roi_boundary = person_detect_roi_boundary
@@ -86,6 +85,7 @@ class VideoProcessor:
             vid = VideoStreamer(self.video_source).start()
 
         if if_webcam(self.video_source):
+            if_webcam_id_is_negative_or_too_large(video_source)
             vid = CamGear(source=int(self.video_source)).start()
 
         else:

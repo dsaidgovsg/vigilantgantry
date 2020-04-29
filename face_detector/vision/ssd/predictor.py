@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+"""
+~~~~~~~~~~~~~~~
+Face detection module
+
+
+Credits: https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB
+"""
 import torch
 
 from ..utils import box_utils
@@ -6,8 +15,19 @@ from ..utils.misc import Timer
 
 
 class Predictor:
-    def __init__(self, net, size, mean=0.0, std=1.0, nms_method=None,
-                 iou_threshold=0.45, filter_threshold=0.01, candidate_size=200, sigma=0.5, device=None):
+    def __init__(
+        self,
+        net,
+        size,
+        mean=0.0,
+        std=1.0,
+        nms_method=None,
+        iou_threshold=0.45,
+        filter_threshold=0.01,
+        candidate_size=200,
+        sigma=0.5,
+        device=None,
+    ):
         self.net = net
         self.transform = PredictionTransform(size, mean, std)
         self.iou_threshold = iou_threshold
@@ -53,12 +73,15 @@ class Predictor:
                 continue
             subset_boxes = boxes[mask, :]
             box_probs = torch.cat([subset_boxes, probs.reshape(-1, 1)], dim=1)
-            box_probs = box_utils.nms(box_probs, self.nms_method,
-                                      score_threshold=prob_threshold,
-                                      iou_threshold=self.iou_threshold,
-                                      sigma=self.sigma,
-                                      top_k=top_k,
-                                      candidate_size=self.candidate_size)
+            box_probs = box_utils.nms(
+                box_probs,
+                self.nms_method,
+                score_threshold=prob_threshold,
+                iou_threshold=self.iou_threshold,
+                sigma=self.sigma,
+                top_k=top_k,
+                candidate_size=self.candidate_size,
+            )
             picked_box_probs.append(box_probs)
             picked_labels.extend([class_index] * box_probs.size(0))
         if not picked_box_probs:
@@ -68,4 +91,8 @@ class Predictor:
         picked_box_probs[:, 1] *= height
         picked_box_probs[:, 2] *= width
         picked_box_probs[:, 3] *= height
-        return picked_box_probs[:, :4], torch.tensor(picked_labels), picked_box_probs[:, 4]
+        return (
+            picked_box_probs[:, :4],
+            torch.tensor(picked_labels),
+            picked_box_probs[:, 4],
+        )

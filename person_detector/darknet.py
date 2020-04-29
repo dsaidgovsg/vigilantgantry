@@ -2,7 +2,7 @@
 
 """
 ~~~~~~~~~~~~~~~
-Yolov3 Model for person detection.
+Yolov3 model for person detection.
 
 
 Credits: https://github.com/ayooshkathuria/pytorch-yolo-v3

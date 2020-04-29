@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+
+"""
+~~~~~~~~~~~~~~~
+Face detection module
+
+
+Credits: https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB
+"""
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -6,8 +15,15 @@ from ..utils import box_utils
 
 
 class MultiboxLoss(nn.Module):
-    def __init__(self, priors, iou_threshold, neg_pos_ratio,
-                 center_variance, size_variance, device):
+    def __init__(
+        self,
+        priors,
+        iou_threshold,
+        neg_pos_ratio,
+        center_variance,
+        size_variance,
+        device,
+    ):
         """Implement SSD Multibox Loss.
 
         Basically, Multibox loss combines classification loss
@@ -37,11 +53,15 @@ class MultiboxLoss(nn.Module):
             mask = box_utils.hard_negative_mining(loss, labels, self.neg_pos_ratio)
 
         confidence = confidence[mask, :]
-        classification_loss = F.cross_entropy(confidence.reshape(-1, num_classes), labels[mask], reduction='sum')
+        classification_loss = F.cross_entropy(
+            confidence.reshape(-1, num_classes), labels[mask], reduction="sum"
+        )
         pos_mask = labels > 0
         predicted_locations = predicted_locations[pos_mask, :].reshape(-1, 4)
         gt_locations = gt_locations[pos_mask, :].reshape(-1, 4)
-        smooth_l1_loss = F.smooth_l1_loss(predicted_locations, gt_locations, reduction='sum')  # smooth_l1_loss
+        smooth_l1_loss = F.smooth_l1_loss(
+            predicted_locations, gt_locations, reduction="sum"
+        )  # smooth_l1_loss
         # smooth_l1_loss = F.mse_loss(predicted_locations, gt_locations, reduction='sum')  #l2 loss
         num_pos = gt_locations.size(0)
         return smooth_l1_loss / num_pos, classification_loss / num_pos

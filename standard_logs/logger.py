@@ -4,7 +4,7 @@
 ~~~~~~~~~~~~~~~
 The setup_logging function provide customs stdout for debug and info. 
 
-
+Author: GovTech
 """
 import yaml
 import logging
@@ -15,7 +15,7 @@ def setup_logging(
     default_path="standard_logs/logging.yaml", default_level=logging.DEBUG
 ):
     """
-    Setup Logging
+    Setup logging
 
     :param default_path: Path to yaml file, defaults to "standard_logs/logging.yaml"
     :type default_path: str, optional
