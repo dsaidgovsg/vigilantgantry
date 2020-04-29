@@ -40,7 +40,7 @@ if __name__ == "__main__":
         dest="video_source",
         type=str,
         default=VIDEO_SOURCE,
-        help="insert either video file path (e.g. \home\), rtsp address (e.g. 'rtsp:\\') or webcam id (e.g. '0')",
+        help="Insert either video file path (e.g. video.mp4), rtsp address (e.g. 'rtsp:\\') or webcam id (e.g. '0')",
     )
 
     parser.add_argument(
@@ -71,14 +71,14 @@ if __name__ == "__main__":
         "--face_seg_threshold_value",
         type=float,
         default=FACE_SEG_THRESHOLD_VALUE,
-        help="insert proportion of exposed face over total face area",
+        help="Insert threshold for proportion of exposed face over total face area",
     )
 
     parser.add_argument(
         "--full_screen_display",
         type=bool,
         default=FULL_SCREEN_DISPLAY,
-        help="insert True for full screen display",
+        help="Insert True for full screen display",
     )
 
     args = parser.parse_args()

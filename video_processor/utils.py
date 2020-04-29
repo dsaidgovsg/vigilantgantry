@@ -23,17 +23,30 @@ def if_rtsp(video_source):
 
 def if_webcam(video_source):
     """
-    if_webcam: Check if video source is from webcam
+    Check if video source is from webcam
 
     :param video_source: video source
     :type video_source: str
     :return: True if video source is from webcam id string
     :rtype: str
     """
+    if_webcam_id_is_negatie_or_too_large(video_source)
+
     return video_source.isdigit()
 
 
-from collections import namedtuple
+def if_webcam_id_is_negatie_or_too_large(video_source):
+    """
+    Check if webcam value is negative
+
+    :param video_source: Webcam device id
+    :type video_source: str
+    :raises Exception: 
+    """
+    if not int(video_source) >= 0 or int(video_source) > 10:
+        raise Exception(
+            f"Webcam dev id '{int(video_source)}' cannot be negative or too large"
+        )
 
 
 def flatten(t):
