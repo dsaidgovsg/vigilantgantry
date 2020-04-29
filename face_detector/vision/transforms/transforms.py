@@ -2,7 +2,7 @@
 
 """
 ~~~~~~~~~~~~~~~
-Face detection module
+Face detection model
 
 
 Credits: https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB and https://github.com/amdegroot/ssd.pytorch
