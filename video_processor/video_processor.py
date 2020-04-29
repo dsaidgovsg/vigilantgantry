@@ -23,6 +23,11 @@ logger = logging.getLogger(__name__)
 
 
 class VideoProcessor:
+    """
+    VideoProcess processes video
+
+    """
+
     def __init__(
         self,
         video_source,
@@ -36,7 +41,7 @@ class VideoProcessor:
     ):
         """
 
-        Initialises VideoProcess Class
+        Initialises VideoProcess class.
 
         :param video_source: Video source path from video file, RTSP or webcam
         :type video_source: str
@@ -85,7 +90,6 @@ class VideoProcessor:
             vid = VideoStreamer(self.video_source).start()
 
         if if_webcam(self.video_source):
-            if_webcam_id_is_negative_or_too_large(video_source)
             vid = CamGear(source=int(self.video_source)).start()
 
         else:

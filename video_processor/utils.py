@@ -30,22 +30,13 @@ def if_webcam(video_source):
     :return: True if video source is from webcam id string
     :rtype: str
     """
-
-    return video_source.isdigit()
-
-
-def if_webcam_id_is_negative_or_too_large(video_source):
-    """
-    Check if webcam value is negative.
-
-    :param video_source: Webcam device id
-    :type video_source: str
-    :raises Exception: 
-    """
-    if not int(video_source) >= 0 or int(video_source) > 10:
-        raise Exception(
-            f"Webcam dev id '{int(video_source)}' cannot be negative or too large"
-        )
+    try:
+        if int(video_source) < 0:
+            raise Exception(f"Webcam dev id '{int(video_source)}' cannot be negative")
+        else:
+            return True
+    except ValueError:
+        return False
 
 
 def flatten(tuple):
