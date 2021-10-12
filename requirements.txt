@@ -21,7 +21,7 @@ Markdown==2.6.11
 matplotlib==3.1.1
 numpy==1.14.3
 olefile==0.45.1
-opencv-python==4.1.0.25
+opencv-python==4.2.0.32
 parso==0.5.0
 pexpect==4.7.0
 pickleshare==0.7.5
